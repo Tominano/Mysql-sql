@@ -84,22 +84,86 @@ select max(fizetes)
 from dolgozo
 group by oazon);
 
-
 -- 3. Adjuk meg, hogy mely dolgozók fizetése jobb, mint a saját osztályán (vagyis
 --     azon az osztályon, ahol dolgozik az ott) dolgozók átlagfizetése!
+select foglalkozas, dnev, fizetes
+from dolgozo d1
+where fizetes >= 
+(select avg(fizetes) from dolgozo
+where oazon = d1.oazon);
+
+
 -- 4. Adjuk meg azokat a foglalkozásokat, amelyek csak egyetlen osztályon fordulnak elő,
 --     és adjuk meg hozzájuk azt az osztályt is, ahol van ilyen foglalkozású dolgozó.
+select nvl(oazon, 0), foglalkozas
+from dolgozo
+where foglalkozas in
+    (select foglalkozas
+    from dolgozo
+    group by foglalkozas
+    having count(oazon) <= 4);
+
+
 -- 5. Adjuk meg osztályonként a legnagyobb fizetésu dolgozó(ka)t, és a fizetést.
+select dnev , fizetes
+from dolgozo
+where fizetes in (
+    select max(fizetes)
+    from dolgozo
+    group by oazon);
+    
 -- 6. Adjuk meg, hogy az egyes osztályokon hány ember dolgozik (azt is, ahol 0=senki).
+select nvl(count(dkod), 0) dolgozók_száma, nvl(oazon, 0)
+from dolgozo
+group by oazon; 
+
 -- 7. Adjuk meg azokat a fizetési kategóriákat, amelyekbe beleesik legalább három
 --     olyan dolgozónak a fizetése, akinek nincs beosztottja.
--- 8. Adjuk meg a legrosszabbul kereső főnök fizetését, és fizetési kategóriáját. 
+select * from dolgozo, fiz_kategoria;
+
+select kategoria
+from fiz_kategoria f, dolgozo
+where (fizetes in (select fizetes from dolgozo where dkod in(
+select dkod from dolgozo where dkod not in(
+select dkod from dolgozo where dkod in (select fonoke from dolgozo)))))between f.also and f.felso;
+
+-- 8. Adjuk meg a legrosszabbul kereső főnök fizetését, és fizetési kategóriáját.
+select distinct fizetes, kategoria
+from fiz_kategoria f, dolgozo d
+where fizetes in (select min(fizetes) from dolgozo where dkod in (select fonoke from dolgozo))
+and d.fizetes between f.also and f.felso;
+
 -- 9. Adjuk meg, hogy (kerekítve) hány hónapja dolgoznak a cégnél azok a dolgozók,
 --     akiknek a DALLAS-i telephelyű osztályon a legnagyobb a fizetésük.
+select dkod, dnev, fizetes,
+round(MONTHS_BETWEEN(sysdate,belepes),0) ledolgozott_hónapok_száma
+from dolgozo d, osztaly o
+where d.oazon = o.oazon
+and o.telephely = 'DALLAS'
+and fizetes = (select max(fizetes)
+                from dolgozo d, osztaly o
+                where d.oazon = o.oazon
+                and o.telephely = 'DALLAS');
+                
 --10. Adjuk meg azokat a foglalkozásokat, amelyek csak egyetlen osztályon fordulnak elő,
 --     és adjuk meg hozzájuk azt az osztályt is, ahol van ilyen foglalkozású dolgozó.
+
+select oazon, foglalkozas
+from dolgozo
+where foglalkozas in
+    (select foglalkozas
+    from dolgozo
+    group by foglalkozas
+    having count(oazon) <= 4);
 --11. Adjuk meg azoknak a dolgozóknak a nevét és fizetését, akik fizetése a 10-es és
 --     20-as osztályok átlagfizetése közé esik. (Nem tudjuk, hogy melyik átlag a nagyobb!)
+select dnev, fizetes
+from dolgozo
+where fizetes between(select round(avg(fizetes),2) from dolgozo where oazon = 10) and 
+(select round(avg(fizetes),2) from doldozo where oazon = 20);
+
+select round(avg(fizetes),2) from dolgozo where oazon = 20;
+select fizetes from dolgozo;
 --12. Adjuk meg osztályonként a dolgozók összfizetését az osztály nevét megjelenítve
 --     ONEV, SUM(FIZETES) formában, és azok az osztályok is jelenjenek meg ahol
 --    nem dolgozik senki, ott az összfizetés 0 legyen. Valamint ha van olyan dolgozó,
