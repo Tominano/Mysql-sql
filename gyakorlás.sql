@@ -63,14 +63,28 @@ having min(fizetes) >
     where oazon = 30);
     
 --10. Adjuk meg a legmagasabb osztályonkénti átlagfizetést!
-select nvl(oazon, 0), max(fizetes)
+select nvl(oazon, 0) oazon, max(fizetes) fizetes
 from dolgozo
 group by oazon;
 
 
 --FELADATSOR-A/5.rész: dolgozo, osztaly (több táblára teljes select utasítás)
 -- 1. Adjuk meg osztályonként a telephelyet és az átlagfizetést.
+
+select telephely, oazon, round(avg(fizetes),2)
+from dolgozo NATURAL JOIN osztaly
+group by oazon, telephely;
+
 -- 2. Kik azok és milyen munkakörben dolgoznak a legnagyobb fizetésű dolgozók?
+
+select nvl(foglalkozas, 'Nem Ismert'), fizetes
+from dolgozo
+where fizetes in(
+select max(fizetes)
+from dolgozo
+group by oazon);
+
+
 -- 3. Adjuk meg, hogy mely dolgozók fizetése jobb, mint a saját osztályán (vagyis
 --     azon az osztályon, ahol dolgozik az ott) dolgozók átlagfizetése!
 -- 4. Adjuk meg azokat a foglalkozásokat, amelyek csak egyetlen osztályon fordulnak elő,
