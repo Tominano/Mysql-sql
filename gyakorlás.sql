@@ -122,10 +122,10 @@ group by oazon;
 select * from dolgozo, fiz_kategoria;
 
 select kategoria
-from fiz_kategoria f, dolgozo
+from fiz_kategoria, dolgozo
 where (fizetes in (select fizetes from dolgozo where dkod in(
 select dkod from dolgozo where dkod not in(
-select dkod from dolgozo where dkod in (select fonoke from dolgozo)))))between f.also and f.felso;
+select dkod from dolgozo where dkod in (select fonoke from dolgozo))))) between fiz_kategoria.also and fiz_kategoria.felso;
 
 -- 8. Adjuk meg a legrosszabbul kereső főnök fizetését, és fizetési kategóriáját.
 select distinct fizetes, kategoria
@@ -157,16 +157,18 @@ where foglalkozas in
     having count(oazon) <= 4);
 --11. Adjuk meg azoknak a dolgozóknak a nevét és fizetését, akik fizetése a 10-es és
 --     20-as osztályok átlagfizetése közé esik. (Nem tudjuk, hogy melyik átlag a nagyobb!)
+
 select dnev, fizetes
 from dolgozo
-where fizetes between(select round(avg(fizetes),2) from dolgozo where oazon = 10) and 
-(select round(avg(fizetes),2) from doldozo where oazon = 20);
+where fizetes between (select round(avg(fizetes),2) from dolgozo where oazon = 10) and 
+(select round(avg(fizetes),2) from dolgozo where oazon = 20);--- itt egynek kellene lennie
 
-select round(avg(fizetes),2) from dolgozo where oazon = 20;
-select fizetes from dolgozo;
 --12. Adjuk meg osztályonként a dolgozók összfizetését az osztály nevét megjelenítve
 --     ONEV, SUM(FIZETES) formában, és azok az osztályok is jelenjenek meg ahol
 --    nem dolgozik senki, ott az összfizetés 0 legyen. Valamint ha van olyan dolgozó,
 --     akinek nincs megadva, hogy mely osztályon dolgozik, azokat a dolgozókat
 --     egy 'FIKTIV' nevű osztályon gyűjtsük össze. Minden osztályt a nevével plusz
 --     ezt a 'FIKTIV' osztált is jelenítsük meg az itt dolgozók összfizetésével együtt. 
+select nvl(TO_CHAR(o.oazon),'NOT') oazon, nvl(onev,'FIKTIV') onev, nvl(sum(fizetes),0) SUMfizetes
+from dolgozo d1 full join osztaly o on d1.oazon = o.oazon
+group by o.oazon,onev;
