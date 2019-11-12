@@ -22,7 +22,7 @@ FROM dolgozo
 WHERE oazon = '20';
 -- 5. Adjuk meg osztályonként az átlagfizetést! (csoportosítása: group by)
 SELECT
-round(AVG(fizetes),2) átlagfizetes, nvl(oazon, 0) osztályazonosító
+round(AVG(fizetes),2) átlagfizetes, nvl(TO_CHAR(oazon),'NINCS OSZTÁLYA') osztályazonosító
 from dolgozo
 GROUP BY oazon;
 -- 6. Adjuk meg azokra az osztályokra az átlagfizetést, ahol ez nagyobb mint 2000.
