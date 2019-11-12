@@ -1,7 +1,7 @@
 -- 1. Mennyi a legnagyobb fizetés a dolgozók között? (max) és a legkisebb? (min)
 
 SELECT 
-    MAX(fizetes) legnagyobb, MIN(fizetes) legkisebb
+    MAX(fizetes) legmagasabbfizetes, MIN(fizetes) legalacsonyabbfizetes
 FROM dolgozo;
 
 -- 2. Mennyi a dolgozók összfizetése? (sum)
@@ -12,7 +12,7 @@ FROM dolgozo;
 
 -- 3. Adjuk meg, hogy hány különböző foglalkozás fordul elo a dolgozók között! (count)
 SELECT
-    COUNT(foglalkozas)
+    COUNT(distinct(foglalkozas)) foglalkozások_száma
 FROM dolgozo;
 
 -- 4. Mennyi a 20-as osztályon az átlagfizetés? (avg)
