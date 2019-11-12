@@ -22,34 +22,33 @@ FROM dolgozo
 WHERE oazon = '20';
 -- 5. Adjuk meg osztályonként az átlagfizetést! (csoportosítása: group by)
 SELECT
-round(AVG(fizetes),2) átlagfizetes, nvl(TO_CHAR(oazon),'NINCS OSZTÁLYA') osztályazonosító
+round(AVG(fizetes),2) átlagfizetes, nvl(TO_CHAR(oazon),'Nem ismert az azonosító') osztályazonosító
 from dolgozo
 GROUP BY oazon;
--- 6. Adjuk meg azokra az osztályokra az átlagfizetést, ahol ez nagyobb mint 2000.
 
-select oazon, round(avg(fizetes),2)
+-- 6. Adjuk meg azokra az osztályokra az átlagfizetést, ahol ez nagyobb mint 2000.
+select nvl(to_char(oazon), 'Nem ismert az azonosító'), round(avg(fizetes),2)
 from dolgozo
 group by oazon
 having round(avg(fizetes),2) > 2000;
 
 -- 7. Melyek azok az osztályok, ahol legalább hárman dolgoznak és mennyi az itt
 --     dolgozók átlagfizetése?
-
 SELECT
     oazon osztályok, round(AVG(fizetes),2) átlagfizetés
 FROM dolgozo
 group by oazon
-having count(dkod)>=3;
+having count(*)>=3;
 
 -- 8. Adjuk meg osztályonként az ott dolgozó hivatalnokok (FOGLALKOZAS='CLERK')
 --     átlagfizetését, de csak azokon az osztályokon, ahol legalább két hivatalnok dolgozik!
 
 SELECT
-    oazon osztályazonosító, AVG(fizetes) átlagfizetés
+    oazon osztályazonosító, round(AVG(fizetes), 2) átlagfizetés
 FROM dolgozo
 where foglalkozas = 'CLERK'
 group by oazon
-HAVING count(dkod)>=2;
+HAVING count(*)>=2;
 
 -- 9. Adjuk meg osztályonként a minimális fizetést, de csak azokat az osztályokét, ahol
 --    a minimális fizetés nagyobb, mint a 30-as osztályon dolgozók minimális fizetése.
@@ -63,39 +62,41 @@ having min(fizetes) >
     where oazon = 30);
     
 --10. Adjuk meg a legmagasabb osztályonkénti átlagfizetést!
-select nvl(oazon, 0) oazon, max(fizetes) fizetes
+select nvl(TO_CHAR(oazon), 'Nem ismert osztály') oazon, max(fizetes) fizetes
 from dolgozo
 group by oazon;
 
 
 --FELADATSOR-A/5.rész: dolgozo, osztaly (több táblára teljes select utasítás)
+
 -- 1. Adjuk meg osztályonként a telephelyet és az átlagfizetést.
 
-select telephely, oazon, round(avg(fizetes),2)
+select telephely, oazon osztályazonosító, round(avg(fizetes),2) átlagfizetés
 from dolgozo NATURAL JOIN osztaly
 group by oazon, telephely;
 
 -- 2. Kik azok és milyen munkakörben dolgoznak a legnagyobb fizetésű dolgozók?
 
-select nvl(foglalkozas, 'Nem Ismert'), fizetes
+select nvl(foglalkozas, 'Nem Ismert') foglalkozás, fizetes
 from dolgozo
 where fizetes in(
 select max(fizetes)
 from dolgozo
 group by oazon);
 
+
 -- 3. Adjuk meg, hogy mely dolgozók fizetése jobb, mint a saját osztályán (vagyis
 --     azon az osztályon, ahol dolgozik az ott) dolgozók átlagfizetése!
-select foglalkozas, dnev, fizetes
+select foglalkozas, dnev név, fizetes
 from dolgozo d1
-where fizetes >= 
+where fizetes >
 (select avg(fizetes) from dolgozo
 where oazon = d1.oazon);
 
 
 -- 4. Adjuk meg azokat a foglalkozásokat, amelyek csak egyetlen osztályon fordulnak elő,
 --     és adjuk meg hozzájuk azt az osztályt is, ahol van ilyen foglalkozású dolgozó.
-select nvl(oazon, 0), foglalkozas
+select nvl(TO_CHAR(oazon), 'Nem ismert') osztáyl, foglalkozas
 from dolgozo
 where foglalkozas in
     (select foglalkozas
@@ -105,7 +106,7 @@ where foglalkozas in
 
 
 -- 5. Adjuk meg osztályonként a legnagyobb fizetésu dolgozó(ka)t, és a fizetést.
-select dnev , fizetes
+select dnev név, fizetes
 from dolgozo
 where fizetes in (
     select max(fizetes)
@@ -113,7 +114,7 @@ where fizetes in (
     group by oazon);
     
 -- 6. Adjuk meg, hogy az egyes osztályokon hány ember dolgozik (azt is, ahol 0=senki).
-select nvl(count(dkod), 0) dolgozók_száma, nvl(oazon, 0)
+select nvl(count(*), 0) dolgozók_száma, nvl(oazon, 0) osztály_azonosító
 from dolgozo
 group by oazon; 
 
@@ -126,6 +127,10 @@ from fiz_kategoria, dolgozo
 where (fizetes in (select fizetes from dolgozo where dkod in(
 select dkod from dolgozo where dkod not in(
 select dkod from dolgozo where dkod in (select fonoke from dolgozo))))) between fiz_kategoria.also and fiz_kategoria.felso;
+
+select kategoria
+from fiz_kategoria f, dolgozo d
+where (select dkod from dolgozo not in(select fonoke from dolgozo));
 
 -- 8. Adjuk meg a legrosszabbul kereső főnök fizetését, és fizetési kategóriáját.
 select distinct fizetes, kategoria
@@ -161,7 +166,9 @@ where foglalkozas in
 select dnev, fizetes
 from dolgozo
 where fizetes between (select round(avg(fizetes),2) from dolgozo where oazon = 10) and 
-(select round(avg(fizetes),2) from dolgozo where oazon = 20);--- itt egynek kellene lennie
+(select round(avg(fizetes),2) from dolgozo where oazon = 20);--- itt egynek kellene lennie---- ez most új!!!próbáld ki
+
+
 
 --12. Adjuk meg osztályonként a dolgozók összfizetését az osztály nevét megjelenítve
 --     ONEV, SUM(FIZETES) formában, és azok az osztályok is jelenjenek meg ahol
