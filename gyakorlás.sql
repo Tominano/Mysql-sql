@@ -1,3 +1,165 @@
+-- TÁBLA---
+DROP TABLE SZERET; 
+
+CREATE TABLE SZERET
+    (NEV         VARCHAR2(15),
+     GYUMOLCS    VARCHAR2(15));
+
+INSERT INTO SZERET VALUES ('Malacka','alma');
+INSERT INTO SZERET VALUES ('Micimackó','alma');
+INSERT INTO SZERET VALUES ('Malacka','körte');
+INSERT INTO SZERET VALUES ('Micimackó','körte');
+INSERT INTO SZERET VALUES ('Kanga','körte');
+INSERT INTO SZERET VALUES ('Tigris','körte');
+INSERT INTO SZERET VALUES ('Micimackó','málna');
+INSERT INTO SZERET VALUES ('Malacka','málna');
+INSERT INTO SZERET VALUES ('Kanga','málna');
+INSERT INTO SZERET VALUES ('Tigris','málna');
+INSERT INTO SZERET VALUES ('Nyuszi','eper');
+INSERT INTO SZERET VALUES ('Malacka','eper');
+
+COMMIT; 
+-------------------------------
+-- 1. Kik szeretik az almát?
+-- 2. Kik nem szeretik az almát? (de valami mást igen)
+-- 3. Kik szeretik vagy az almát vagy a körtét?
+-- 4. Kik szeretik az almát is és a körtét is?
+-- 5. Kik azok, akik szeretik az almát, de nem szeretik a körtét?
+-- 6. Kik szeretik vagy az almát vagy a körtét, de csak az egyiket?
+--
+-- 7. Kik szeretnek legalább kétféle gyümölcsöt?
+-- 8. Kik szeretnek legalább háromféle gyümölcsöt?
+-- 9. Kik szeretnek legfeljebb kétféle gyümölcsöt?
+--10. Kik szeretnek pontosan kétféle gyümölcsöt?  
+--
+--  eddig
+--  innen a köv.hét, és ma még SQL where feltétel, lásd lentebb
+--
+--11. Kik szeretnek minden gyümölcsöt?
+--    (Kik szeretik az összes olyan gyümölcsöt, amit valaki szeret?)
+--12. Kik azok, akik legalább azokat a gyümölcsöket szeretik, mint Micimackó?
+--13. Kik azok, akik legfeljebb azokat a gyümölcsöket szeretik, mint Micimackó?
+--14. Kik azok, akik pontosan azokat a gyümölcsöket szeretik, mint Micimackó?
+-- GRANT SELECT ON SZERET TO PUBLIC;
+---------------------------------------------------
+--Tábla------
+DROP TABLE Fiz_Kategoria;
+DROP TABLE Dolgozo;
+DROP TABLE Osztaly;
+
+ALTER SESSION SET NLS_DATE_LANGUAGE = ENGLISH;
+ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MON-YYYY';
+
+CREATE TABLE Osztaly
+    (OAZON             NUMBER(2) NOT NULL,
+     ONEV              VARCHAR2(14),
+     TELEPHELY         VARCHAR2(13),
+     CONSTRAINT OSZT_PK PRIMARY KEY (OAZON));
+
+INSERT INTO Osztaly VALUES (10,'ACCOUNTING','NEW YORK');
+INSERT INTO Osztaly VALUES (20,'RESEARCH','DALLAS');
+INSERT INTO Osztaly VALUES (30,'SALES','CHICAGO');
+INSERT INTO Osztaly VALUES (40,'OPERATIONS','BOSTON');
+
+CREATE TABLE Dolgozo
+    (DKOD               NUMBER(4) NOT NULL,
+     DNEV               VARCHAR2(10),
+     FOGLALKOZAS        VARCHAR2(9),
+     FONOKE             NUMBER(4) CONSTRAINT DOLG_SELF_KEY REFERENCES Dolgozo (DKOD),
+     BELEPES            DATE,
+     FIZETES            NUMBER(7,2),
+     JUTALEK            NUMBER(7,2),
+     OAZON              NUMBER(2),
+     CONSTRAINT DOLG_FK FOREIGN KEY (OAZON) REFERENCES Osztaly (OAZON),
+     CONSTRAINT DOLG_PK PRIMARY KEY (DKOD));
+
+INSERT INTO Dolgozo VALUES (7839,'KING','PRESIDENT',NULL,'17-NOV-1981',5000,NULL,10);
+INSERT INTO Dolgozo VALUES (7698,'BLAKE','MANAGER',7839,'1-MAY-1981',2850,NULL,30);
+INSERT INTO Dolgozo VALUES (7782,'CLARK','MANAGER',7839,'9-JUN-1981',2450,NULL,10);
+INSERT INTO Dolgozo VALUES (7566,'JONES','MANAGER',7839,'2-APR-1981',2975,NULL,20);
+INSERT INTO Dolgozo VALUES (7654,'MARTIN','SALESMAN',7698,'28-SEP-1981',1250,1400,30);
+INSERT INTO Dolgozo VALUES (7499,'ALLEN','SALESMAN',7698,'20-FEB-1981',1600,300,30);
+INSERT INTO Dolgozo VALUES (7844,'TURNER','SALESMAN',7698,'8-SEP-1981',1500,0,30);
+INSERT INTO Dolgozo VALUES (7900,'JAMES','CLERK',7698,'3-DEC-1981',950,NULL,30);
+INSERT INTO Dolgozo VALUES (7521,'WARD','SALESMAN',7698,'22-FEB-1981',1250,500,30);
+INSERT INTO Dolgozo VALUES (7902,'FORD','ANALYST',7566,'3-DEC-1981',3000,NULL,20);
+INSERT INTO Dolgozo VALUES (7369,'SMITH','CLERK',7902,'17-DEC-1980',800,NULL,20);
+INSERT INTO Dolgozo VALUES (7788,'SCOTT','ANALYST',7566,'09-DEC-1982',3000,NULL,20);
+INSERT INTO Dolgozo VALUES (7876,'ADAMS','CLERK',7788,'12-JAN-1983',1100,NULL,20);
+INSERT INTO Dolgozo VALUES (7934,'MILLER','CLERK',7782,'23-JAN-1982',1300,NULL,10);
+INSERT INTO Dolgozo VALUES (7877,'LOLA','CLERK',7902,'12-JAN-1981',800,NULL,NULL);
+INSERT INTO Dolgozo VALUES (7878,'BLACK',NULL,7902,'01-MAY-1987',1800,300,NULL);
+
+CREATE TABLE Fiz_Kategoria (
+ KATEGORIA          NUMBER,
+ ALSO               NUMBER,
+ FELSO              NUMBER);
+
+INSERT INTO Fiz_Kategoria VALUES (1,700,1200);
+INSERT INTO Fiz_Kategoria VALUES (2,1201,1400);
+INSERT INTO Fiz_Kategoria VALUES (3,1401,2000);
+INSERT INTO Fiz_Kategoria VALUES (4,2001,3000);
+INSERT INTO Fiz_Kategoria VALUES (5,3001,9999);
+
+COMMIT; 
+
+GRANT SELECT ON Osztaly TO PUBLIC; 
+GRANT SELECT ON Dolgozo TO PUBLIC;
+GRANT SELECT ON Fiz_Kategoria TO PUBLIC;
+
+ALTER SESSION SET NLS_DATE_LANGUAGE = HUNGARIAN;
+ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY.MM.DD';
+
+SELECT * FROM Osztaly;
+SELECT * FROM Dolgozo;
+SELECT * FROM Fiz_Kategoria;
+-------------------------------------------
+--- Rel.algebra vetítés művelete (SQL-ben multihalmaz -> rel.alg.-ban halmaz!)
+-- 1.  Adjuk meg a dolgozók között előforduló foglalkozások neveit! (select lista)
+-- 2.  Adjuk meg a dolgozók között előforduló foglalkozások neveit (DISTINCT is),
+--     az eredmény halmaz legyen, vagyis minden foglalkozást csak egyszer írjuk ki!
+-- 3. Adjuk meg a dolgozók kódját, nevét és az éves fizetését, amikor kifejezést
+--     használunk az oszlopnevek helyén, ott adjunk új oszlopnevet ("éves fizetés")
+   
+--- Rel.algebra kiválasztás művelete és azh SQL SELECT utasítás WHERE feltétele
+-- 4. Kik azok a dolgozók, akiknek a fizetése > 2800? (kiválasztás, elemi feltétel)
+-- 5. Írjuk ki a 'KING' nevű dolgozó(k) adatait! (kar.tip.konstans megadása 'KING')
+-- 6. Kik azok a dolgozók, akiknek a fizetése 2000 és 4500 között van?
+--     (1.mo: kiválasztás, összetett feltétel; 2.mo: where-ben: intervallum)
+-- 7. Kik azok a dolgozók, akik a 10-es vagy a 20-as osztályon dolgoznak?
+--     (1.mo: kiválasztás, összetett feltétel; 2.mo: where-ben: in értékek)
+-- 8. Adjuk meg azon dolgozókat, akik nevének második betűje 'A' (where: like)
+-- 9. Kik azok a dolgozók, akiknek a jutaléka nagyobb, mint 600?
+--10. Kik azok a dolgozók, akiknek a jutaléka kisebb-vagy-egyenlő, mint 600?
+--11. Kik azok a dolgozók, akiknek a jutaléka ismeretlen (hiányzó adat, nincs kitöltve)
+--12. Kik azok a dolgozók, akiknek a jutaléka ismert (vagyis nem NULL)
+   
+--- Köv.itt nem alap relációs algebrai művelet, de az SQL lekérdezésekben hasznos
+--     művelet az eredménytábla sorait rendezni (ORDER BY, kiterjesztett rel.algebra)
+--13. Listázzuk ki a dolgozókat foglalkozásonként, azon belül nevenként rendezve.
+--14. Listázzuk ki a dolgozókat fizetés szerint csökkenőleg rendezve.
+--15. Kik azok a dolgozók, akiknek nincs főnöke?
+--  16. Kik azok a dolgozók, akiknek a főnöke KING? 
+--  17. Adjuk meg azoknak a főnököknek a nevét, akiknek a foglalkozása nem 'MANAGER'.
+--  18. Adjuk meg azokat a dolgozókat, akik többet keresnek a főnöküknél.
+--  19. Kik azok a dolgozók, akik főnökének a főnöke KING?
+--  20. Kik azok a dolgozók, akik osztályának telephelye DALLAS vagy CHICAGO?
+--  21. Kik azok a dolgozók, akik osztályának telephelye nem DALLAS és nem CHICAGO?
+-- 22. Adjuk meg azoknak a nevét, akiknek a fizetése > 2000 vagy a CHICAGO-i osztályon dolgoznak.
+--  23. Melyik osztálynak nincs dolgozója?
+--  24. Adjuk meg azokat a dolgozókat, akiknek van 2000-nél nagyobb fizetésű beosztottja.
+--  25. Adjuk meg azokat a dolgozókat, akiknek nincs 2000-nél nagyobb fizetésű beosztottja.
+--  26. Adjuk meg azokat a telephelyeket, ahol van elemző (ANALYST) foglalkozású dolgozó.
+--  27. Adjuk meg azokat a telephelyeket, ahol nincs elemző (ANALYST) foglalkozású dolgozó.
+--  28. Adjuk meg azoknak a dolgozóknak a nevét, akiknek a legnagyobb a fizetésük.
+--  29. Adjuk meg azon osztályok nevét és telephelyét, amelyeknek van 1-es fizetési
+--        kategóriájú dolgozója.
+--  30. Adjuk meg azon osztályok nevét és telephelyét, amelyeknek  nincs 1-es fizetési
+--        kategóriájú dolgozója.
+---------------------------------------------------------------------------------------
+--TÁBLA----
+
+
 -- 1. Mennyi a legnagyobb fizetés a dolgozók között? (max) és a legkisebb? (min)
 
 SELECT 
@@ -323,10 +485,8 @@ where oazon = 20;
  where jutalek is NULL or fizetes < (select avg(fizetes) from dolgozo);
  
 --11. Növeljük meg mindenkinek a jutalékát a jelenlegi maximális jutalékkal.
-
 update dolgozo
-set jutalek = nvl(jutalek,0) +
-(select max(jutalek) from dolgozo);
+set jutalek = jutalek + max(jutalek); -- nem jo
 
 --12. Módosítsuk 'Loser'-re a legrosszabbul kereső dolgozó nevét.
 update dolgozo
