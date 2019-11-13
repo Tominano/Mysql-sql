@@ -259,14 +259,39 @@ select dnev from dolgozo
 where fonoke not in(select dkod from dolgozo where foglalkozas = 'MANAGETR');
 
 --  18. Adjuk meg azokat a dolgozókat, akik többet keresnek a főnöküknél.
-select * from dolgozo
-where dkod in (select dkod from dolgoz where fizetes not in(select fizetes from dolgoz where ) );
+select fizetes from dolgozo where (select fizetes from dolgozo) >        ---------------------------------
+(select fizetes from dolgozo where dkod in (select fonoke from dolgozo));
+
 --  19. Kik azok a dolgozók, akik főnökének a főnöke KING?
+select dnev from dolgozo where select fizetes from dolgozo where dkod in (select fonoke from dolgozo);
+
 --  20. Kik azok a dolgozók, akik osztályának telephelye DALLAS vagy CHICAGO?
+select * from dolgozo
+where oazon in 
+(select oazon from osztaly 
+where telephely = 'DALLAS' or telephely = 'CHICAGO');
+
 --  21. Kik azok a dolgozók, akik osztályának telephelye nem DALLAS és nem CHICAGO?
+select * from dolgozo
+where oazon not in 
+(select oazon from osztaly 
+where telephely = 'DALLAS' or telephely = 'CHICAGO');
+
 -- 22. Adjuk meg azoknak a nevét, akiknek a fizetése > 2000 vagy a CHICAGO-i osztályon dolgoznak.
+select dnev from dolgozo
+where fizetes > 2000 or
+dolgozo.oazon in (select oazon from osztaly
+where telephely = 'DALLAS');
+
 --  23. Melyik osztálynak nincs dolgozója?
+
+select onev from osztaly
+where oazon not in (
+    select oazon from dolgozo where dkod is NULL);
+
 --  24. Adjuk meg azokat a dolgozókat, akiknek van 2000-nél nagyobb fizetésű beosztottja.
+select dnev from dolgozo 
+where
 --  25. Adjuk meg azokat a dolgozókat, akiknek nincs 2000-nél nagyobb fizetésű beosztottja.
 --  26. Adjuk meg azokat a telephelyeket, ahol van elemző (ANALYST) foglalkozású dolgozó.
 --  27. Adjuk meg azokat a telephelyeket, ahol nincs elemző (ANALYST) foglalkozású dolgozó.
