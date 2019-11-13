@@ -286,13 +286,21 @@ where telephely = 'DALLAS');
 --  23. Melyik osztálynak nincs dolgozója?
 
 select onev from osztaly
-where oazon not in (
+where oazon not in (select distinct fizetes, kategoria
+from fiz_kategoria f, dolgozo d
+where fizetes in (select min(fizetes) from dolgozo where dkod in (select fonoke from dolgozo))
+and d.fizetes between f.also and f.felso;
+
     select oazon from dolgozo where dkod is NULL);
 
 --  24. Adjuk meg azokat a dolgozókat, akiknek van 2000-nél nagyobb fizetésű beosztottja.
-select dnev from dolgozo 
-where
+select dnev from dolgozo where fizetes > 2000
+minus
+select dnev from dolgozo where dkod in(select fonoke from dolgozo);
 --  25. Adjuk meg azokat a dolgozókat, akiknek nincs 2000-nél nagyobb fizetésű beosztottja.
+select dnev from dolgozo where fizetes < 2000
+minus
+select dnev from dolgozo where dkod in(select fonoke from dolgozo);
 --  26. Adjuk meg azokat a telephelyeket, ahol van elemző (ANALYST) foglalkozású dolgozó.
 --  27. Adjuk meg azokat a telephelyeket, ahol nincs elemző (ANALYST) foglalkozású dolgozó.
 --  28. Adjuk meg azoknak a dolgozóknak a nevét, akiknek a legnagyobb a fizetésük.
