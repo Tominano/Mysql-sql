@@ -199,34 +199,68 @@ SELECT * FROM Osztaly;
 SELECT * FROM Dolgozo;
 SELECT * FROM Fiz_Kategoria;
 -------------------------------------------
---- Rel.algebra vetítés művelete (SQL-ben multihalmaz -> rel.alg.-ban halmaz!)
 -- 1.  Adjuk meg a dolgozók között előforduló foglalkozások neveit! (select lista)
+select foglalkozas from dolgozo;
+
 -- 2.  Adjuk meg a dolgozók között előforduló foglalkozások neveit (DISTINCT is),
 --     az eredmény halmaz legyen, vagyis minden foglalkozást csak egyszer írjuk ki!
+select distinct NVL(foglalkozas,'Ismeretlen') from dolgozo;
+
 -- 3. Adjuk meg a dolgozók kódját, nevét és az éves fizetését, amikor kifejezést
 --     használunk az oszlopnevek helyén, ott adjunk új oszlopnevet ("éves fizetés")
+select dkod dolgozó_kódja, dnev név, fizetes+nvl(jutalek,0) éves_fizetes_jutalékkal from dolgozo;
    
---- Rel.algebra kiválasztás művelete és azh SQL SELECT utasítás WHERE feltétele
+
 -- 4. Kik azok a dolgozók, akiknek a fizetése > 2800? (kiválasztás, elemi feltétel)
+select fizetes, dnev név from dolgozo where fizetes > 2800;
+
 -- 5. Írjuk ki a 'KING' nevű dolgozó(k) adatait! (kar.tip.konstans megadása 'KING')
+select * from dolgozo where dnev = 'KING';
+
 -- 6. Kik azok a dolgozók, akiknek a fizetése 2000 és 4500 között van?
 --     (1.mo: kiválasztás, összetett feltétel; 2.mo: where-ben: intervallum)
+select * from dolgozo where fizetes between 2000 and 4500;
+
 -- 7. Kik azok a dolgozók, akik a 10-es vagy a 20-as osztályon dolgoznak?
 --     (1.mo: kiválasztás, összetett feltétel; 2.mo: where-ben: in értékek)
+select * from dolgozo where oazon = 10 or oazon = 20;
+
 -- 8. Adjuk meg azon dolgozókat, akik nevének második betűje 'A' (where: like)
+select * from dolgozo where dnev like '_A%';
+
 -- 9. Kik azok a dolgozók, akiknek a jutaléka nagyobb, mint 600?
+select * from dolgozo where jutalek > 600;
+
 --10. Kik azok a dolgozók, akiknek a jutaléka kisebb-vagy-egyenlő, mint 600?
+select * from dolgozo where jutalek <= 600;
+
 --11. Kik azok a dolgozók, akiknek a jutaléka ismeretlen (hiányzó adat, nincs kitöltve)
+select * from dolgozo where jutalek is NULL;
+
 --12. Kik azok a dolgozók, akiknek a jutaléka ismert (vagyis nem NULL)
-   
---- Köv.itt nem alap relációs algebrai művelet, de az SQL lekérdezésekben hasznos
---     művelet az eredménytábla sorait rendezni (ORDER BY, kiterjesztett rel.algebra)
+select * from dolgozo where jutalek is not NULL;
+
 --13. Listázzuk ki a dolgozókat foglalkozásonként, azon belül nevenként rendezve.
+select * from dolgozo order by foglalkozas ASC; 
+
 --14. Listázzuk ki a dolgozókat fizetés szerint csökkenőleg rendezve.
+select * from dolgozo order by fizetes DESC;
+
 --15. Kik azok a dolgozók, akiknek nincs főnöke?
+select * from dolgozo
+where fonoke is NULL;
+
 --  16. Kik azok a dolgozók, akiknek a főnöke KING? 
+select * from dolgozo
+where fonoke in (select dkod from dolgozo where dnev = 'KING');
+
 --  17. Adjuk meg azoknak a főnököknek a nevét, akiknek a foglalkozása nem 'MANAGER'.
+select dnev from dolgozo
+where fonoke not in(select dkod from dolgozo where foglalkozas = 'MANAGETR');
+
 --  18. Adjuk meg azokat a dolgozókat, akik többet keresnek a főnöküknél.
+select * from dolgozo
+where dkod in (select dkod from dolgoz where fizetes not in(select fizetes from dolgoz where ) );
 --  19. Kik azok a dolgozók, akik főnökének a főnöke KING?
 --  20. Kik azok a dolgozók, akik osztályának telephelye DALLAS vagy CHICAGO?
 --  21. Kik azok a dolgozók, akik osztályának telephelye nem DALLAS és nem CHICAGO?
