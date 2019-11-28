@@ -1,1 +1,0 @@
-(1, 'Livingroom', 20, 'C')(2, 'Bathroom', 30, 'C')(3, 'Livingroom', 23, 'C')(4, 'Livingroom', 20, 'C')(5, 'Bathroom', 30, 'C')(6, 'Livingroom', 23, 'C')
