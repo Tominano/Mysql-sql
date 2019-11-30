@@ -19,6 +19,6 @@
 19,Livingroom,20,C
 20,Bathroom,30,C
 21,Livingroom,23,C
-21,Livingroom,20,C
+22,Livingroom,20,C
 24,Bathroom,30,C
 25,Livingroom,23,C
