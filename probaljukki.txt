@@ -1,2 +1,4 @@
 3 Bathroom 30 C
 6 Bathroom 30 C
+3 Bathroom 30 C
+6 Bathroom 30 C
